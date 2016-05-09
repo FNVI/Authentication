@@ -1,0 +1,29 @@
+{
+    "name": "fnvi/authentication",
+    "description": "Description of project Authentication.",
+    "authors": [
+        {
+            "name": "joew",
+            "email": "joew@fnvi.co.uk"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:FNVI/mongo.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "git@github.com:FNVI/Email.git"
+        }
+    ],
+    "require": {
+        "fnvi/mongo": "dev-master",
+        "fnvi/email": "dev-master"
+    },
+    "autoload":{
+        "psr-4":{
+            "FNVi\\Authentication\\":"src"
+        }
+    }
+}
