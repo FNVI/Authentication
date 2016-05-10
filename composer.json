@@ -18,8 +18,8 @@
         }
     ],
     "require": {
-        "fnvi/mongo": "dev-master",
-        "fnvi/email": "dev-master"
+        "fnvi/mongo": "0.1.0",
+        "fnvi/email": "0.1.0"
     },
     "autoload":{
         "psr-4":{
