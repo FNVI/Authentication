@@ -25,9 +25,16 @@ and open the template in the editor.
             
             $auth = new Auth();
             
-            $token = filter_input(INPUT_GET,"token", FILTER_SANITIZE_STRING);
+            $args = [
+                "email"=>FILTER_SANITIZE_EMAIL,
+                "token"=>FILTER_SANITIZE_STRING
+            ];
             
-            $auth->confirmEmail($token);
+            $get_vars = filter_input_array(INPUT_GET, $args);
+            
+            
+            echo json_encode($get_vars);
+            $auth->confirmEmail($get_vars["email"], $get_vars["token"]);
             
             
         ?>

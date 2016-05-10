@@ -22,7 +22,9 @@ and open the template in the editor.
             include '../../vendor/autoload.php';
             
             use FNVi\Authentication\Schemas\User;
+            use FNVi\Authentication\Auth;
             
+            $auth = new Auth();
             $args = [
                 "username"=>FILTER_SANITIZE_STRING,
                 "email"=>FILTER_SANITIZE_STRING,
@@ -34,7 +36,7 @@ and open the template in the editor.
             if(!empty($_POST)){
                 $user = new User($post_vars["username"],$post_vars["password"]);
                 $user->email = $post_vars["email"];
-                $user->store();
+                $auth->registerUser($user, "You have successfully registered for the test app.", true);
             }
             
         ?>
