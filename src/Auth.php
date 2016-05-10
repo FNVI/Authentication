@@ -136,7 +136,7 @@ class Auth {
         $user = $this->users->onlyDeleted()->findOne(["email"=>$email]);
         if($user){
             if(User::checkHash($user->getId().floor(strtotime("now") / 3600),$token)){
-                $this->users->onlyDeleted->update(["email"=>$email])->recover()->updateOne();
+                $this->users->onlyDeleted()->update(["email"=>$email])->recover()->updateOne();
                 $this->message = "Email confirmed";
             }
             else
