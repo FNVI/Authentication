@@ -81,6 +81,7 @@ and open the template in the editor.
                                 <input type="password" class="form-control" id="password" name="password">
                             </div>
                             <button type="submit" class="btn btn-success">Login</button>
+                            <span><a href="forgottenpassword.php">Forgot password?</a></span>
                         </form>
                     </div>
                 </div>

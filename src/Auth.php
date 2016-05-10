@@ -131,8 +131,23 @@ class Auth {
         return $url;
     }
     
-    public function confirmEmail($token){
-        return $this->users->onlyDeleted()->update(["tokens.confirm email"=>$token])->clear(["tokens.confirm email"])->recover()->updateOne();
+    public function confirmEmail($email,$token){
+//        return $this->users->onlyDeleted()->update(["tokens.confirm email"=>$token])->clear(["tokens.confirm email"])->recover()->updateOne();
+        $user = $this->users->onlyDeleted()->findOne(["email"=>$email]);
+        if($user){
+            if(User::checkHash($user->getId().floor(strtotime("now") / 3600),$token)){
+                $this->users->onlyDeleted->update(["email"=>$email])->recover()->updateOne();
+                $this->message = "Email confirmed";
+            }
+            else
+            {
+                $this->message = "Invalid token";
+            }
+        }
+        else
+        {
+            $this->message = "Invalid email address";
+        }
     }
     
     public function resetPassword($email, $token, $password = ""){
@@ -157,10 +172,24 @@ class Auth {
      * 
      * @param \FNVi\Authentication\FNVi\Authentication\Schemas\User $user
      */
-    public function registerUser(User $user){
-        $users = new Users();
-        $user->markInactive();
-        return $user->store();
+    public function registerUser(User $user, $emailMessage = "", $confirmAddress = false){
+        $subject = "Welcome!";
+        if($confirmAddress){
+            $user->markInactive();
+            $token = User::generateHash($user->getId().floor(strtotime("now") / 3600));
+            $url = "http://192.168.33.4/joe/authentication/examples/regular/confirmemail.php?".http_build_query(["email"=>$user->email,"token"=>$token]);
+            $emailMessage .= "<br>Click <a href='$url'>here</a> to confirm your email address";
+            $subject .= " Please confirm email address";
+        }
+        $ouptut = $this->users->insertOne($user);
+        if($ouptut->getInsertedCount() && $emailMessage != ""){
+            $email = new Email($user->email, EMAIL_ADDRESS, $subject);
+            if($email->message($emailMessage)->send()){
+                $this->message = "Please confirm your email address!";
+                return true;
+            }
+        }
+        return false;
     }
     
     public function forgottenPassword($email){
@@ -175,7 +204,7 @@ class Auth {
             $url = "http://192.168.33.4/joe/authentication/examples/regular/resetpassword.php?".http_build_query($vars);
             $emailObject = new Email();
             $emailObject  ->to($email)
-                    ->from("admin@fnvi.co.uk")
+                    ->from(EMAIL_ADDRESS)
                     ->subject("Forgotten password")
                     ->message("Click <a href='$url'>here</a> to reset password! ");
             if($emailObject->send()){

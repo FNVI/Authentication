@@ -56,25 +56,9 @@ and open the template in the editor.
             <div class="jumbotron">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3">
-                        <h1>Login!</h1>
                         <span class="text-danger">
                             <?php echo $auth->getMessage(); ?>
                         </span>
-                        <form method="post">
-                            <div class="form-group">
-                                <label for="user">
-                                    Username
-                                </label>
-                                <input type="text" class="form-control" id="user" name="username">
-                            </div>
-                            <div class="form-group">
-                                <label for="password">
-                                    Username
-                                </label>
-                                <input type="password" class="form-control" id="password" name="password">
-                            </div>
-                            <button type="submit" class="btn btn-success">Login</button>
-                        </form>
                     </div>
                 </div>
             </div>

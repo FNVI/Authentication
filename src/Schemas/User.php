@@ -15,6 +15,7 @@ class User extends Schema{
     protected $password;
     public $email;
     protected $tokens;
+    protected $emailConfirmed = false;
     protected $failedLogins = 0;
     protected $permissions = [];
 
