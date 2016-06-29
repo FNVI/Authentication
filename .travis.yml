@@ -1,0 +1,12 @@
+language: php
+php:
+    - '5.6'
+services:
+    - mongodb
+before_script: 
+    - pecl install mongodb
+    - phpenv config-add travisConfig.ini
+    - composer self-update
+    - composer install --prefer-source --no-interaction
+    
+script: phpunit
