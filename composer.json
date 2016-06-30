@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "fnvi/mongo": "0.1.0",
+        "fnvi/mongo": "dev-unit-testing",
         "fnvi/email": "0.1.0"
     },
     "require-dev": {
