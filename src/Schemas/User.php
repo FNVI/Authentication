@@ -68,8 +68,8 @@ class User extends Schema{
         return self::checkHash($password, $this->password);
     }
     
-    public function stamp(){
-        return parent::stamp(["username"]);
+    public function stamp($fields = []){
+        return parent::stamp(array_merge(["username"],$fields));
     }
         
     public function getUsername(){
