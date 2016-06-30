@@ -26,6 +26,15 @@ class User extends Schema{
             $this->setPassword($password);
         }
     }
+    
+    public function grantPermissions(array $permissions){
+        $this->permissions = array_merge($this->permissions, $permissions);
+    }
+    
+    public function revokePermissions(array $permissions){
+        $this->permissions = array_diff($this->permissions, $permissions);
+    }
+    
         
     public function hasPermission($permission){
         if($permission === "login"){
