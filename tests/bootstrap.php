@@ -2,5 +2,7 @@
 
 define("DATABASE", "testdb");
 define("MONGOURI","mongodb://localhost");
-
 include 'vendor/autoload.php';
+
+// ob_start required to allow session headers to be set!
+ob_start();
