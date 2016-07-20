@@ -178,7 +178,7 @@ class Auth {
         if($confirmAddress){
             $user->markInactive();
             $token = User::generateHash($user->getId().floor(strtotime("now") / 3600));
-            $url = "http://192.168.33.4/joe/authentication/examples/regular/confirmemail.php?".http_build_query(["email"=>$user->email,"token"=>$token]);
+            $url = "http://".$_SERVER['HTTP_HOST'].'/'.constant("URL_CONFIRM_EMAIL").'?'.http_build_query(["email"=>$user->email,"token"=>$token]);
             $emailMessage .= "<br>Click <a href='$url'>here</a> to confirm your email address";
             $subject .= " Please confirm email address";
         }
@@ -208,7 +208,7 @@ class Auth {
                 "email"=>$email,
                 "token"=>$token
             ];
-            $url = "http://192.168.33.4/joe/authentication/examples/regular/resetpassword.php?".http_build_query($vars);
+            $url = "http://".$_SERVER['HTTP_HOST'].'/'.constant("URL_FORGOTTEN_PASSWORD").'?'.http_build_query($vars);
             $emailObject = new Email();
             $emailObject  ->to($email)
                     ->from(EMAIL_ADDRESS)
