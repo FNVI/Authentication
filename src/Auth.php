@@ -174,6 +174,7 @@ class Auth {
      */
     public function registerUser(User $user, $emailMessage = "", $confirmAddress = false){
         $subject = "Welcome!";
+        $token = "";
         if($confirmAddress){
             $user->markInactive();
             $token = User::generateHash($user->getId().floor(strtotime("now") / 3600));
@@ -189,10 +190,16 @@ class Auth {
                 return true;
             }
         }
-        return false;
+        return $token;
     }
     
-    public function forgottenPassword($email){
+    public function signupUser(User $user){
+        if($this->users->insertOne($user)->getInsertedCount()){
+            
+        }
+    }
+    
+    public function forgottenPassword($email, $template){
         
         $user = $this->users->findOne(["email"=>$email]);
         if($user){
@@ -215,6 +222,6 @@ class Auth {
         {
             $this->message = "User not found";
         }
-        
+        return $token;
     }
 }
