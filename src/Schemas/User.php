@@ -11,7 +11,7 @@ use FNVi\Mongo\Schema;
  */
 class User extends Schema{
     
-    protected $username;
+    public $username;
     protected $password;
     public $email;
     protected $tokens;

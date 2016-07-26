@@ -30,7 +30,7 @@ class Session extends Schema{
         $this->store();
     }
     
-    public function setUser($user){
+    public function setUser(User $user){
         $this->user_id = $user->_id;
         $this->store();
     }
