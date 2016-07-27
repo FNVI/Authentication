@@ -43,9 +43,9 @@ class Session extends Schema{
         return null;
     }
 
-
     public function endSession(){
-        $this->delete();
+        unset($_SESSION["key"]);
+        return $this->delete()->getModifiedCount();
     }
     
     public static function keyExists(){
@@ -80,8 +80,9 @@ class Session extends Schema{
     }
     
     public static function stop() {
-        if (session_destroy()) {
-            self::getSession()->delete();
+        
+        if(self::getSession()->endSession()) {
+            session_destroy();
             return true;
         }
         return false;
