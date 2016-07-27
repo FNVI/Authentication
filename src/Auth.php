@@ -138,6 +138,7 @@ class Auth {
             if(User::checkHash($user->getId().floor(strtotime("now") / 3600),$token)){
                 $this->users->onlyDeleted()->update(["email"=>$email])->recover()->updateOne();
                 $this->message = "Email confirmed";
+                return true;
             }
             else
             {
@@ -148,6 +149,7 @@ class Auth {
         {
             $this->message = "Invalid email address";
         }
+        return false;
     }
     
     public function resetPassword($email, $token, $password = ""){
@@ -184,19 +186,13 @@ class Auth {
         }
         $ouptut = $this->users->insertOne($user);
         if($ouptut->getInsertedCount() && $emailMessage != ""){
-            $email = new Email($user->email, EMAIL_ADDRESS, $subject);
+            $email = new Email($user->email, constant("EMAIL_ADDRESS"), $subject);
             if($email->message($emailMessage)->send()){
                 $this->message = "Please confirm your email address!";
                 return true;
             }
         }
         return $token;
-    }
-    
-    public function signupUser(User $user){
-        if($this->users->insertOne($user)->getInsertedCount()){
-            
-        }
     }
     
     public function forgottenPassword($email, $template){
@@ -216,6 +212,7 @@ class Auth {
                     ->message("Click <a href='$url'>here</a> to reset password! ");
             if($emailObject->send()){
                 $this->message = "Email sent to $email";
+                return $token;
             }
         }
         else
