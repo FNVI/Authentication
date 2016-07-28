@@ -9,7 +9,7 @@ use FNVi\Authentication\Schemas\Session;
  * @author Joe Wheatley <joew@fnvi.co.uk>
  */
 class SessionTest extends TestCase{
-
+    
     /**
      * 
      * @return Session
@@ -28,26 +28,41 @@ class SessionTest extends TestCase{
      * @return Session
      */
     public function testSetUser(Session $session){
-        
         $user = new User("user","password");
         $user->store();
-//        $session->setUser($user);
+        $session->setUser($user);
         $session->store();
         return $session;
     }
     
-//    /**
-//     * @depends testGetUser
-//     * @param Session $session
-//     * @return Session
-//     */
-//    public function testGetUser(Session $session){
-//        
-//        $user = $session->getUser();
-//        
-//        $this->assertNotNull($user);
-//        $this->assertEquals("user", $user->username);
-//        return $session;
-//    }
+    /**
+     * @depends testSetUser
+     * @param Session $session
+     * @return Session
+     */
+    public function testGetUser(Session $session){
+        
+        $user = $session->getUser();
+        
+        $this->assertNotNull($user);
+        $this->assertEquals("user", $user->username);
+        return $session;
+    }
+    
+    /**
+     * @depends testGetUser
+     * @param Session $session
+     * @return Session
+     */
+    public function testGetSession(Session $session){
+        $result = Session::getSession();
+        $this->assertEquals($session, $result);
+        return $session;
+    }
+    
+    public static function tearDownAfterClass() {
+        Session::stop();
+        parent::tearDownAfterClass();
+    }
     
 }
