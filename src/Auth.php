@@ -5,7 +5,7 @@ namespace FNVi\Authentication;
 use FNVi\Authentication\Schemas\Session;
 use FNVi\Authentication\Collections\Users;
 use FNVi\Authentication\Schemas\User;
-use FNVi\Email;
+use MongoDB\BSON\ObjectID;
 
 /**
  * Description of Auth
@@ -131,12 +131,10 @@ class Auth {
         return $url;
     }
     
-    public function confirmEmail($email,$token){
-//        return $this->users->onlyDeleted()->update(["tokens.confirm email"=>$token])->clear(["tokens.confirm email"])->recover()->updateOne();
-        $user = $this->users->onlyDeleted()->findOne(["email"=>$email]);
+    public function confirmEmail(User $user, $token){
         if($user){
-            if(User::checkHash($user->getId().floor(strtotime("now") / 3600),$token)){
-                $this->users->onlyDeleted()->update(["email"=>$email])->recover()->updateOne();
+            if(Auth::checkToken($user->getId(),$token)){
+                $user->recover();
                 $this->message = "Email confirmed";
                 return true;
             }
@@ -155,7 +153,7 @@ class Auth {
     public function resetPassword($email, $token, $password = ""){
         $user = $this->users->findOne(["email"=>$email]);
         if($user){
-            if(User::checkHash($user->getId().floor(strtotime("now") / 3600),$token)){
+            if(Auth::checkToken($user->getId(),$token)){
                 $user->setPassword($password);
                 $user->store();
             }
@@ -172,53 +170,40 @@ class Auth {
     
     /**
      * 
-     * @param \FNVi\Authentication\FNVi\Authentication\Schemas\User $user
+     * @param User $user
      */
-    public function registerUser(User $user, $emailMessage = "", $confirmAddress = false){
-        $subject = "Welcome!";
-        $token = "";
+    public function registerUser(User $user, $confirmAddress){
+        $token = true;
         if($confirmAddress){
             $user->markInactive();
-            $token = User::generateHash($user->getId().floor(strtotime("now") / 3600));
-            $url = "http://".$_SERVER['HTTP_HOST'].'/'.constant("URL_CONFIRM_EMAIL").'?'.http_build_query(["email"=>$user->email,"token"=>$token]);
-            $emailMessage .= "<br>Click <a href='$url'>here</a> to confirm your email address";
-            $subject .= " Please confirm email address";
+            $token = Auth::issueToken($user->getId());
         }
         $ouptut = $this->users->insertOne($user);
-        if($ouptut->getInsertedCount() && $emailMessage != ""){
-            $email = new Email($user->email, constant("EMAIL_ADDRESS"), $subject);
-            if($email->message($emailMessage)->send()){
-                $this->message = "Please confirm your email address!";
-                return true;
-            }
+        if($ouptut->getInsertedCount()){
+            $this->message = "Please confirm your email address!";
+            return $token;
         }
-        return $token;
+        return false;
     }
     
-    public function forgottenPassword($email, $template){
-        
-        $user = $this->users->findOne(["email"=>$email]);
-        if($user){
-            $token = User::generateHash($user->getId().floor(strtotime("now") / 3600));
-            $vars = [
-                "email"=>$email,
-                "token"=>$token
-            ];
-            $url = "http://".$_SERVER['HTTP_HOST'].'/'.constant("URL_FORGOTTEN_PASSWORD").'?'.http_build_query($vars);
-            $emailObject = new Email();
-            $emailObject  ->to($email)
-                    ->from(EMAIL_ADDRESS)
-                    ->subject("Forgotten password")
-                    ->message("Click <a href='$url'>here</a> to reset password! ");
-            if($emailObject->send()){
-                $this->message = "Email sent to $email";
-                return $token;
-            }
-        }
-        else
-        {
-            $this->message = "User not found";
-        }
-        return $token;
+    /**
+     * 
+     * @param User $user
+     * @return string
+     */
+    public function forgottenPassword(User $user){
+        return Auth::issueToken($user->getId());
+    }
+    
+    public static function issueToken(ObjectID $id){
+        return User::generateHash($id.self::time());
+    }
+    
+    public static function checkToken(ObjectID $id, $token){
+        return User::checkHash($id.self::time(),$token);
+    }
+    
+    private static function time(){
+        return floor(strtotime("now") / 3600);
     }
 }
