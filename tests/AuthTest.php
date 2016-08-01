@@ -19,9 +19,6 @@ class AuthTest extends TestCase{
         $this->user->email = "joew@fnvi.co.uk";
         parent::setUp();
     }
-    
-    
-
 
     public function testConstructor(){
         $auth = new Auth();
