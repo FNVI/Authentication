@@ -38,6 +38,22 @@ class AuthTest extends TestCase{
         return $auth;
     }
     
+    /**
+     * @depends testConstructor
+     * @param Auth $auth
+     * @return Auth
+     */
+    public function testResetPassword(Auth $auth){
+        $token = $auth->forgottenPassword($this->user);
+        $this->assertNotNull($token);
+        $resetResult = $auth->resetPassword($this->user, $token, "something");
+        $this->assertTrue($resetResult);
+        $result = $auth->login($this->user, "something");
+        $this->assertTrue($result);
+        
+        return $auth;
+    }
+    
     public function testTokens(){
         $id = new ObjectID();
         $token = Auth::issueToken($id);
