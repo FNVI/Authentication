@@ -60,18 +60,17 @@ class Auth {
         return $this->user;
     }
     
-    public function login($username, $password){
-        
-        $user = $this->users->findOne(["username"=>$username]);
+    public function login(User $user, $password){
+        $user = $this->users->findOne(["_id"=>$user->getId()]);
         if($user){
             if($user->checkPassword($password))
             {
                 $this->user = $user;
                 $this->session->setUser($user);
-                if($_SESSION["url"]){
-                    $this->redirect($_SESSION["url"], "successfully logged in");
-                    unset($_SESSION["url"]);
-                }
+//                if($_SESSION["url"]){
+//                    $this->redirect($_SESSION["url"], "successfully logged in");
+//                    unset($_SESSION["url"]);
+//                }
                 return true;
             }
         }
@@ -150,12 +149,12 @@ class Auth {
         return false;
     }
     
-    public function resetPassword($email, $token, $password = ""){
-        $user = $this->users->findOne(["email"=>$email]);
+    public function resetPassword(User $user, $token, $password){
         if($user){
             if(Auth::checkToken($user->getId(),$token)){
                 $user->setPassword($password);
                 $user->store();
+                return true;
             }
             else
             {
@@ -166,6 +165,7 @@ class Auth {
         {
             $this->message = "Invalid email address";
         }
+        return false;
     }
     
     /**
@@ -192,6 +192,8 @@ class Auth {
      * @return string
      */
     public function forgottenPassword(User $user){
+        $user->markInactive();
+        $user->store();
         return Auth::issueToken($user->getId());
     }
     
