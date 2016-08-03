@@ -25,12 +25,13 @@ and open the template in the editor.
             
             $auth = new Auth();
             
-            
+            $token = false;
+            $email = false;
             
             if(!empty($_POST))
             {
                 $email = filter_input(INPUT_POST, "email", FILTER_SANITIZE_EMAIL);
-                $auth->forgottenPassword($email);
+                $token = $auth->forgottenPassword($email);
             }
             
         ?>
@@ -58,22 +59,33 @@ and open the template in the editor.
         <div class="container" style="padding-top: 80px;">
             <div class="jumbotron">
                 <div class="row">
-                    <div class="col-md-6 col-md-offset-3">
-                        <h1>Forgotten password!</h1>
-                        <span>Enter your email address below to recover password</span>
-                        <span class="text-danger">
-                            <?php echo $auth->getMessage(); ?>
-                        </span>
-                        <form method="post">
-                            <div class="form-group">
-                                <label for="email">
-                                    Email
-                                </label>
-                                <input type="text" class="form-control" id="email" name="email">
-                            </div>
-                            <button type="submit" class="btn btn-success">Send</button>
-                        </form>
-                    </div>
+                    <?php if(!$email){ ?>
+                        <div class="col-md-6 col-md-offset-3">
+                            <h1>Forgotten password!</h1>
+                            <span>Enter your email address below to recover password</span>
+                            <span class="text-danger">
+                                <?php echo $auth->getMessage(); ?>
+                            </span>
+                            <form method="post">
+                                <div class="form-group">
+                                    <label for="email">
+                                        Email
+                                    </label>
+                                    <input type="text" class="form-control" id="email" name="email">
+                                </div>
+                                <button type="submit" class="btn btn-success">Send</button>
+                            </form>
+                        </div>
+                    <?php } else { ?>
+                        <div class="col-md-6 col-md-offset-3">
+                            This token should be sent to the users email address to verify their identity.
+                            <br>
+                            <?php echo $token; ?>
+                            <br>
+                            <?php $url = "resetpassword.php?".http_build_query(["email"=>$post_vars["email"],"token"=>$token]); ?>
+                            <a href="<?php echo $url ?>">Click here to confirm</a>
+                        </div>
+                    <?php } ?>
                 </div>
             </div>
         </div>

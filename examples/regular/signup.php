@@ -24,6 +24,8 @@ and open the template in the editor.
             use FNVi\Authentication\Schemas\User;
             use FNVi\Authentication\Auth;
             
+            $token = false;
+            
             $auth = new Auth();
             $args = [
                 "username"=>FILTER_SANITIZE_STRING,
@@ -36,7 +38,7 @@ and open the template in the editor.
             if(!empty($_POST)){
                 $user = new User($post_vars["username"],$post_vars["password"]);
                 $user->email = $post_vars["email"];
-                $auth->registerUser($user, "You have successfully registered for the test app.", true);
+                $token = $auth->registerUser($user, "You have successfully registered for the test app.", true);
             }
             
         ?>
@@ -64,6 +66,7 @@ and open the template in the editor.
         <div class="container" style="padding-top: 80px;">
             <div class="jumbotron">
                 <div class="row">
+                    <?php if(empty($_POST)){ ?>
                     <div class="col-md-6 col-md-offset-3">
                         <h1>Signup!</h1>
                         <form method="post">
@@ -88,6 +91,16 @@ and open the template in the editor.
                             <button type="submit" class="btn btn-success">Signup</button>
                         </form>
                     </div>
+                    <?php } else { ?>
+                        <div class="col-md-6 col-md-offset-3">
+                            This token should be sent to the user to verify their email address.
+                            <br>
+                            <?php echo $token; ?>
+                            <br>
+                            <?php $url = "confirmemail.php?".http_build_query(["email"=>$post_vars["email"],"token"=>$token]); ?>
+                            <a href="<?php echo $url ?>">Click here to confirm</a>
+                        </div>
+                    <?php } ?>
                 </div>
             </div>
         </div>
