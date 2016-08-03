@@ -11,15 +11,10 @@
         {
             "type": "vcs",
             "url":  "git@github.com:FNVI/mongo.git"
-        },
-        {
-            "type": "vcs",
-            "url":  "git@github.com:FNVI/Email.git"
         }
     ],
     "require": {
-        "fnvi/mongo": "dev-unit-testing", 
-        "fnvi/email": "0.1.0"
+        "fnvi/mongo": "dev-unit-testing"
     },
     "require-dev": {
         "phpunit/phpunit": "5.4.*"
