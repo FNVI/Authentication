@@ -192,8 +192,6 @@ class Auth {
      * @return string
      */
     public function forgottenPassword(User $user){
-        $user->markInactive();
-        $user->store();
         return Auth::issueToken($user->getId());
     }
     
