@@ -60,21 +60,20 @@ class Auth {
         return $this->user;
     }
     
-    public function login(User $user, $password){
-        $user = $this->users->findOne(["_id"=>$user->getId()]);
+    public function login(array $query, $password){
+        $user = $this->users->findOne($query += ["emailConfirmed"=>true]);
         if($user){
             if($user->checkPassword($password))
             {
                 $this->user = $user;
                 $this->session->setUser($user);
-//                if($_SESSION["url"]){
-//                    $this->redirect($_SESSION["url"], "successfully logged in");
-//                    unset($_SESSION["url"]);
-//                }
                 return true;
+            } else {
+                $this->message = "Incorrect username/password";
+                return false;
             }
         }
-        $this->message = "Cannot login, check details";
+        $this->message = "User not found, or email address not confirmed";
         return false;
     }
     
@@ -130,10 +129,11 @@ class Auth {
         return $url;
     }
     
-    public function confirmEmail(User $user, $token){
+    public function confirmEmail(array $query, $token){
+        $user = $this->users->includeDeleted()->findOne($query);
         if($user){
             if(Auth::checkToken($user->getId(),$token)){
-                $user->recover();
+                $this->users->update($query)->set(["emailConfirmed"=>true])->updateOne();
                 $this->message = "Email confirmed";
                 return true;
             }
@@ -149,7 +149,8 @@ class Auth {
         return false;
     }
     
-    public function resetPassword(User $user, $token, $password){
+    public function resetPassword(array $query, $token, $password){
+        $user = $this->users->findOne($query);
         if($user){
             if(Auth::checkToken($user->getId(),$token)){
                 $user->setPassword($password);
@@ -175,7 +176,6 @@ class Auth {
     public function registerUser(User $user, $confirmAddress){
         $token = true;
         if($confirmAddress){
-            $user->markInactive();
             $token = Auth::issueToken($user->getId());
         }
         $ouptut = $this->users->insertOne($user);
@@ -188,11 +188,15 @@ class Auth {
     
     /**
      * 
-     * @param User $user
+     * @param array $query
      * @return string
      */
-    public function forgottenPassword(User $user){
-        return Auth::issueToken($user->getId());
+    public function forgottenPassword(array $query){
+        $user = $this->users->findOne($query);
+        if($user){
+            return Auth::issueToken($user->getId());
+        }
+        return null;
     }
     
     public static function issueToken(ObjectID $id){
