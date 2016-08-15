@@ -16,7 +16,7 @@ class AuthTest extends TestCase{
     
     protected function setUp() {
         $this->user = new User("user","password");
-        $this->user->email = "joew@fnvi.co.uk";
+        $this->user->email = "user@authtest.com";
         parent::setUp();
     }
 
@@ -33,7 +33,7 @@ class AuthTest extends TestCase{
     public function testSignup(Auth $auth){
         $token = $auth->registerUser($this->user,true);
         $this->assertNotFalse($token);
-        $result = $auth->confirmEmail($this->user, $token);
+        $result = $auth->confirmEmail(["email"=>$this->user->email], $token);
         $this->assertTrue($result, $auth->getMessage());
         return $auth;
     }
@@ -44,11 +44,11 @@ class AuthTest extends TestCase{
      * @return Auth
      */
     public function testResetPassword(Auth $auth){
-        $token = $auth->forgottenPassword($this->user);
+        $token = $auth->forgottenPassword(["email"=>$this->user->email]);
         $this->assertNotNull($token);
-        $resetResult = $auth->resetPassword($this->user, $token, "something");
-        $this->assertTrue($resetResult);
-        $result = $auth->login($this->user, "something");
+        $resetResult = $auth->resetPassword(["email"=>$this->user->email], $token, "something");
+        $this->assertTrue($resetResult, $auth->getMessage());
+        $result = $auth->login(["email"=>$this->user->email], "something");
         $this->assertTrue($result);
         
         return $auth;
