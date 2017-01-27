@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace FNVi\Authentication\Schemas;
 
 use FNVi\Mongo\Schema;
-use FNVi\Authentication\Collections\Sessions;
-use FNVi\Authentication\Collections\Users;
+use MongoDB\BSON\ObjectID;
 
 
 /**
@@ -20,6 +13,12 @@ use FNVi\Authentication\Collections\Users;
  */
 class Session extends Schema{
     
+    protected static $strict = true;
+
+    /**
+     *
+     * @var ObjectID
+     */
     protected $user_id;
     protected $timestamp;
     
@@ -27,35 +26,44 @@ class Session extends Schema{
         parent::__construct();
         $this->timestamp = $this->timestamp();
         $_SESSION["key"] = $this->_id."";
-        $this->store();
+        $this->save();
     }
     
-    public function setUser(User $user){
-        $this->user_id = $user->_id;
-        $this->store();
+    /**
+     * Stores the user against the session
+     * @param ObjectID $user
+     */
+    public function setUser(ObjectID $user){
+        $this->user_id = $user;
+        $this->save();
     }
-    
+    /**
+     * Gets the user from the session
+     * @return ObjectID
+     */
     public function getUser(){
-        if($this->user_id)
-        {
-            return (new Users())->findOne(["_id"=>$this->user_id]);
-        }
-        return null;
+        return $this->user_id;
     }
 
     public function endSession(){
         unset($_SESSION["key"]);
-        return $this->delete()->getModifiedCount();
     }
     
     public static function keyExists(){
         return key_exists("key", $_SESSION);
     }
     
+    /**
+     * Gets the session key
+     * @return string
+     */
     private static function getKey(){
         return $_SESSION["key"];
     }
-  
+    
+    /**
+     * Starts or resumes a current session
+     */
     public static function start(){
         if(session_status() === PHP_SESSION_NONE)
         {
@@ -64,19 +72,15 @@ class Session extends Schema{
     }
     
     /**
-     * 
-     * @return FNVi\Authentication\Schemas\Session
+     * Gets the current session
+     * @return Session
      */
     public static function getSession(){
         $session = null;
         if(self::keyExists()){
-            $session = self::loadSession();
+            $session = self::loadFromID(self::getKey());
         }
         return $session ? $session : new Session();
-    }
-
-    private static function loadSession(){
-        return (new Sessions())->loadSession(self::getKey());
     }
     
     public static function stop() {

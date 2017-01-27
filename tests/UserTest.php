@@ -8,6 +8,18 @@ use FNVi\Authentication\Schemas\User;
  */
 class UserTest extends TestCase{
     
+    /**
+     *
+     * @var User
+     */
+    protected $user;
+
+    protected $username = "user";
+    protected $password = "password";
+
+    protected function setUp() {
+        $this->user = new User($this->username, $this->password);
+    }
     
     public function testHashes(){
         $password = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -16,41 +28,28 @@ class UserTest extends TestCase{
         $this->assertTrue(User::checkHash($password, $hash));
     }
     
-    /**
-     * 
-     * @return User
-     */
     public function testConstructor(){
-        $user = new User("user","password");
-        
-        $this->assertTrue($user->checkPassword("password"));
-        
-        return $user;
+        $this->assertTrue($this->user->checkPassword($this->password));
+        $this->assertFalse($this->user->checkPassword("incorrect"));
     }
     
-    /**
-     * @depends testConstructor
-     * @param User $user A User object
-     */
-    public function testPermissions(User $user){
+    public function testPermissions(){
         $permissions = ["canEditSomething","canViewSomething"];
         
         foreach($permissions as $permission){
-            $this->assertFalse($user->hasPermission($permission));
+            $this->assertFalse($this->user->hasPermission($permission));
         }
         
-        $user->grantPermissions($permissions);
+        $this->user->grantPermissions($permissions);
         
         foreach($permissions as $permission){
-            $this->assertTrue($user->hasPermission($permission));
+            $this->assertTrue($this->user->hasPermission($permission));
         }
         
-        $user->revokePermissions($permissions);
+        $this->user->revokePermissions([$permissions[1]]);
         
-        foreach($permissions as $permission){
-            $this->assertFalse($user->hasPermission($permission));
-        }
-        
+        $this->assertFalse($this->user->hasPermission($permissions[1]));
+        $this->assertTrue($this->user->hasPermission($permissions[0]));
     }
     
 }

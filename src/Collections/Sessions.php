@@ -3,7 +3,7 @@
 namespace FNVi\Authentication\Collections;
 
 use FNVi\Mongo\Collection;
-use MongoDB\BSON\ObjectID;
+
 /**
  * Description of Sessions
  *
@@ -12,10 +12,6 @@ use MongoDB\BSON\ObjectID;
 class Sessions extends Collection{
     
     public function __construct() {
-        parent::__construct();
-    }
-
-    public function loadSession($id){
-        return $this->findOne(["_id"=>new ObjectID($id."")]);
+        parent::__construct("sessions");
     }
 }
