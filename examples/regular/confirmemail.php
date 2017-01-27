@@ -22,8 +22,12 @@ and open the template in the editor.
             include '../../vendor/autoload.php';
             
             use FNVi\Authentication\Auth;
+            use FNVi\Authentication\Collections\Users;
             
             $auth = new Auth();
+            
+            $users = new Users();
+            
             
             $args = [
                 "email"=>FILTER_SANITIZE_EMAIL,
@@ -32,10 +36,9 @@ and open the template in the editor.
             
             $get_vars = filter_input_array(INPUT_GET, $args);
             
+            $user = $users->includeDeleted()->findOne(["email"=>$get_vars["email"]]);
             
-            echo json_encode($get_vars);
-            $auth->confirmEmail($get_vars["email"], $get_vars["token"]);
-            
+            $auth->confirmEmail($user, $get_vars["token"]);
             
         ?>
         <nav class="navbar navbar-default">

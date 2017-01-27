@@ -22,8 +22,10 @@ and open the template in the editor.
             include '../../vendor/autoload.php';
             
             use FNVi\Authentication\Auth;
+            use FNVi\Authentication\Collections\Users;
             
             $auth = new Auth();
+            $users = new Users();
             
             $args = [
                 "username"=>FILTER_SANITIZE_STRING,
@@ -34,7 +36,9 @@ and open the template in the editor.
             
             if(!empty($_POST))
             {
-                $auth->login($post_vars["username"], $post_vars["password"]);
+                $user = $users->includeDeleted()->findOne(["email"=>$post_vars["username"]]);
+                echo json_encode($user);
+                $auth->login($user, $post_vars["password"]);
             }
             
         ?>

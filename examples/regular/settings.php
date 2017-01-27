@@ -1,5 +1,7 @@
 <?php
 
+define("DEVELOPMENT",false);
+
 define("MONGOURI","mongodb://FNVJoe:p455w0rd@localhost");
 define("DATABASE","authentication");
 
