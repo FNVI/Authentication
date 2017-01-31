@@ -3,7 +3,8 @@
 namespace FNVi\Authentication\Schemas;
 
 use FNVi\Mongo\Schema;
-use MongoDB\BSON\ObjectID;
+use FNVi\Mongo\Stamp;
+use FNVi\Authentication\Schemas\User;
 
 
 /**
@@ -17,9 +18,9 @@ class Session extends Schema{
 
     /**
      *
-     * @var ObjectID
+     * @var Stamp
      */
-    protected $user_id;
+    public $user;
     protected $timestamp;
     
     public function __construct() {
@@ -31,24 +32,37 @@ class Session extends Schema{
     
     /**
      * Stores the user against the session
-     * @param ObjectID $user
+     * 
+     * This should work with any user object, even those that extends the User class
+     * @param User $user
      */
-    public function setUser(ObjectID $user){
-        $this->user_id = $user;
+    public function setUser(User $user){
+        $this->user = $user->stamp();
         $this->save();
     }
+    
     /**
      * Gets the user from the session
-     * @return ObjectID
+     * 
+     * This should work with any user object, even those that extend the User class
+     * @return Stamp
      */
     public function getUser(){
-        return $this->user_id;
+        return $this->user;
     }
-
+    /**
+     * Ends the current session
+     * 
+     * This unsets the session key in the browser to achieve ending the session
+     */
     public function endSession(){
         unset($_SESSION["key"]);
     }
     
+    /**
+     * Checks a session key exists for the user
+     * @return string
+     */
     public static function keyExists(){
         return key_exists("key", $_SESSION);
     }
@@ -84,7 +98,6 @@ class Session extends Schema{
     }
     
     public static function stop() {
-        
         if(self::getSession()->endSession()) {
             session_destroy();
             return true;
