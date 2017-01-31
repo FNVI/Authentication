@@ -6,7 +6,13 @@ use FNVi\Mongo\Schema;
 use FNVi\Authentication\Collections\Users;
 
 /**
- * Description of User
+ * Represents an application user
+ * 
+ * This class can be used on its own for very basic functionality however it is
+ * ideal to extend the class to add more details to the users profile while still
+ * being able to be used with the authentication package.
+ * 
+ * Functionality provided for checking passwords and permissions
  *
  * @author Joe Wheatley <joew@fnvi.co.uk>
  */
@@ -18,14 +24,28 @@ class User extends Schema{
      */
     protected static $strict = true;
 
-    
+    /**
+     * @var string
+     */
     public $username;
+    /**
+     * @var string 
+     */
     protected $password;
+    /**
+     * @var string 
+     */
     public $email;
+    
     protected $emailConfirmed = false;
-    protected $failedLogins = 0;
+    public $failedLoginAttempts = 0;
     protected $permissions = [];
 
+    /**
+     * Creates a User object
+     * @param string $username
+     * @param string $password
+     */
     public function __construct($username, $password = null) {
         parent::__construct(new Users());
         $this->username = $username;
@@ -99,17 +119,19 @@ class User extends Schema{
     
     /**
      * Checks the users password is correct
+     * 
+     * This function also implements the failed logins counter
      * @param string $password
      * @return boolean
      */
     public function checkPassword($password){
         return self::checkHash($password, $this->password);
     }
-    
+        
     /**
-     * Gets a stamp of the user
+     * 
      * @param array $fields
-     * @return array
+     * @return Stamp
      */
     public function stamp(array $fields = []){
         return parent::stamp(array_merge(["username"],$fields));
