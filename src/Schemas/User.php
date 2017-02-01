@@ -3,7 +3,7 @@
 namespace FNVi\Authentication\Schemas;
 
 use FNVi\Mongo\Schema;
-use FNVi\Authentication\Collections\Users;
+use FNVi\Mongo\Collection;
 
 /**
  * Represents an application user
@@ -40,14 +40,15 @@ class User extends Schema{
     protected $emailConfirmed = false;
     public $failedLoginAttempts = 0;
     protected $permissions = [];
-
+    
+    
     /**
      * Creates a User object
      * @param string $username
      * @param string $password
      */
     public function __construct($username, $password = null) {
-        parent::__construct(new Users());
+        parent::__construct(new Collection("users"));
         $this->username = $username;
         if($password){
             $this->setPassword($password);

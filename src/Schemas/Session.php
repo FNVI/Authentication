@@ -6,7 +6,6 @@ use FNVi\Mongo\Schema;
 use FNVi\Mongo\Stamp;
 use FNVi\Authentication\Schemas\User;
 
-
 /**
  * Description of Session
  *
@@ -24,7 +23,7 @@ class Session extends Schema{
     protected $timestamp;
     
     public function __construct() {
-        parent::__construct();
+        parent::__construct(new \FNVi\Mongo\Collection("sessions"));
         $this->timestamp = $this->timestamp();
         $_SESSION["key"] = $this->_id."";
         $this->save();
@@ -45,10 +44,10 @@ class Session extends Schema{
      * Gets the user from the session
      * 
      * This should work with any user object, even those that extend the User class
-     * @return Stamp
+     * @return User
      */
     public function getUser(){
-        return $this->user;
+        return User::loadFromID($this->user->_id);
     }
     /**
      * Ends the current session
