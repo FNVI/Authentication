@@ -32,7 +32,7 @@ class Auth {
      */
     private $session;
     
-    private $authorised = true;
+    private $authorised = false;
     
     public function __construct() {
         $this->session = Session::getSession();
@@ -68,6 +68,10 @@ class Auth {
      */
     public function requiresLogin(){
         return $this->requires("login");
+    }
+    
+    public function isLoggedIn(){
+        return $this->user ? true : false;
     }
         
     /**
@@ -118,8 +122,7 @@ class Auth {
      * @param User $user
      */
     public function registerUser(User $user){
-       $result = $this->users->insertOne($user);
-       return $result->getInsertedCount() ? true : false;
+       return $this->users->insertOne($user)->getInsertedCount()? true : false;
     }
     
     public static function setMaxLoginAttempts($number){

@@ -47,7 +47,7 @@ class Session extends Schema{
      * @return User
      */
     public function getUser(){
-        return User::loadFromID($this->user->_id);
+        return $this->user ? User::loadFromID($this->user->_id) : null;
     }
     /**
      * Ends the current session
